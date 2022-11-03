@@ -25,6 +25,7 @@ type PaddingT string
 const (
 	PKCS5_PADDING PaddingT = "PKCS5"
 	PKCS7_PADDING PaddingT = "PKCS7"
+	ZEROS_PADDING PaddingT = "ZEROS"
 )
 
 // *********************************************************************************************************************
@@ -75,4 +76,32 @@ func PKCS5Padding(src []byte, blockSize int) []byte {
 // *********************************************************************************************************************
 func PKCS5UnPadding(src []byte) ([]byte, error) {
 	return PKCS7UnPadding(src)
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/03 10:03:49 ColeCai.
+// *********************************************************************************************************************
+func ZerosPadding(src []byte, blockSize int) []byte {
+	padding := blockSize - len(src)%blockSize
+	if padding == 0 {
+		return src
+	}
+	return append(src, bytes.Repeat([]byte{byte(0)}, padding)...)
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/03 10:05:30 ColeCai.
+// *********************************************************************************************************************
+func ZerosUnPadding(src []byte) ([]byte, error) {
+	for i := len(src) - 1; ; i-- {
+		if src[i] != 0 {
+			return src[:i+1], nil
+		}
+	}
 }
