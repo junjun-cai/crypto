@@ -105,3 +105,39 @@ func ZerosUnPadding(src []byte) ([]byte, error) {
 		}
 	}
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/04 10:31:39 ColeCai.
+// *********************************************************************************************************************
+func Padding(padding PaddingT, src []byte, blockSize int) []byte {
+	switch padding {
+	case PKCS5_PADDING:
+		return PKCS5Padding(src, blockSize)
+	case PKCS7_PADDING:
+		return PKCS7Padding(src, blockSize)
+	case ZEROS_PADDING:
+		return ZerosPadding(src, blockSize)
+	}
+	return src
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/04 10:34:16 ColeCai.
+// *********************************************************************************************************************
+func UnPadding(padding PaddingT, src []byte) ([]byte, error) {
+	switch padding {
+	case PKCS5_PADDING:
+		return PKCS5UnPadding(src)
+	case PKCS7_PADDING:
+		return PKCS7UnPadding(src)
+	case ZEROS_PADDING:
+		return ZerosUnPadding(src)
+	}
+	return src, nil
+}
