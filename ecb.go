@@ -33,7 +33,7 @@ func newECB(b cipher.Block) *ecb {
 	}
 }
 
-type ecbEncryptor ecb
+type ecbEncrypter ecb
 
 // *********************************************************************************************************************
 // * SUMMARY:
@@ -42,7 +42,7 @@ type ecbEncryptor ecb
 // *    -create: 2022/11/15 12:13:09 ColeCai.
 // *********************************************************************************************************************
 func NewECBEncrypter(b cipher.Block) cipher.BlockMode {
-	return (*ecbEncryptor)(newECB(b))
+	return (*ecbEncrypter)(newECB(b))
 }
 
 // *********************************************************************************************************************
@@ -51,7 +51,7 @@ func NewECBEncrypter(b cipher.Block) cipher.BlockMode {
 // * HISTORY:
 // *    -create: 2022/11/15 12:15:58 ColeCai.
 // *********************************************************************************************************************
-func (e *ecbEncryptor) BlockSize() int { return e.blockSize }
+func (e *ecbEncrypter) BlockSize() int { return e.blockSize }
 
 // *********************************************************************************************************************
 // * SUMMARY:
@@ -59,7 +59,7 @@ func (e *ecbEncryptor) BlockSize() int { return e.blockSize }
 // * HISTORY:
 // *    -create: 2022/11/15 12:16:31 ColeCai.
 // *********************************************************************************************************************
-func (e *ecbEncryptor) CryptBlocks(dst, src []byte) {
+func (e *ecbEncrypter) CryptBlocks(dst, src []byte) {
 	if len(src)%e.blockSize != 0 {
 		panic("crypto/ecb: input not full blocks.")
 	}
@@ -68,6 +68,46 @@ func (e *ecbEncryptor) CryptBlocks(dst, src []byte) {
 	}
 	for len(src) > 0 {
 		e.b.Encrypt(dst, src[:e.blockSize])
+		src = src[e.blockSize:]
+		dst = dst[e.blockSize:]
+	}
+}
+
+type ecbDecrypter ecb
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/16 10:06:31 ColeCai.
+// *********************************************************************************************************************
+func NewCFBDecrypter(b cipher.Block) cipher.BlockMode {
+	return (*ecbDecrypter)(newECB(b))
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/16 10:07:39 ColeCai.
+// ********************************************************************************************************************
+func (e *ecbDecrypter) BlockSize() int { return e.blockSize }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/16 10:08:17 ColeCai.
+// *********************************************************************************************************************
+func (e *ecbDecrypter) CryptBlocks(dst, src []byte) {
+	if len(src)%e.blockSize != 0 {
+		panic("crypto/ecb: input not full blocks.")
+	}
+	if len(dst) < len(src) {
+		panic("crypto/ecb: output smaller than input.")
+	}
+	for len(src) > 0 {
+		e.b.Decrypt(dst, src[:e.blockSize])
 		src = src[e.blockSize:]
 		dst = dst[e.blockSize:]
 	}
