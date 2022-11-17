@@ -15,6 +15,51 @@ package crypto
 
 import "crypto/cipher"
 
+type ECBCipher struct {
+	block   cipher.Block
+	padding PaddingT
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/17 09:42:17 ColeCai.
+// *********************************************************************************************************************
+func NewECBCipher(block cipher.Block, padding PaddingT) *ECBCipher {
+	return &ECBCipher{
+		block:   block,
+		padding: padding,
+	}
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/17 09:43:14 ColeCai.
+// *********************************************************************************************************************
+func (e *ECBCipher) Encrypt(src []byte) ([]byte, error) {
+	src = Padding(e.padding, src, e.block.BlockSize())
+	encrypted := make([]byte, len(src))
+	ecb := NewECBEncrypter(e.block)
+	ecb.CryptBlocks(encrypted, src)
+	return encrypted, nil
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/17 09:45:27 ColeCai.
+// *********************************************************************************************************************
+func (e *ECBCipher) Decrypt(src []byte) ([]byte, error) {
+	dst := make([]byte, len(src))
+	ecb := NewECBDecrypter(e.block)
+	ecb.CryptBlocks(dst, src)
+	return UnPadding(e.padding, dst)
+}
+
 type ecb struct {
 	b         cipher.Block
 	blockSize int
@@ -81,7 +126,7 @@ type ecbDecrypter ecb
 // * HISTORY:
 // *    -create: 2022/11/16 10:06:31 ColeCai.
 // *********************************************************************************************************************
-func NewCFBDecrypter(b cipher.Block) cipher.BlockMode {
+func NewECBDecrypter(b cipher.Block) cipher.BlockMode {
 	return (*ecbDecrypter)(newECB(b))
 }
 
