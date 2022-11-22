@@ -19,7 +19,7 @@ import "crypto/aes"
 // * SUMMARY:
 // * WARNING:
 // * HISTORY:
-// *    -create: 2022/11/17 09:53:18 ColeCai.
+// *    -create: 2022/11/21 09:53:18 ColeCai.
 // *********************************************************************************************************************
 func NewAesCBCCryptor(aesKey, iv []byte, padding PaddingT) (ICryptor, error) {
 	cipher, err := aes.NewCipher(aesKey)
@@ -27,4 +27,18 @@ func NewAesCBCCryptor(aesKey, iv []byte, padding PaddingT) (ICryptor, error) {
 		return nil, err
 	}
 	return NewCBCCipher(cipher, iv, padding), nil
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/22 09:58:58 ColeCai.
+// *********************************************************************************************************************
+func NewAesCFBCryptor(aesKey, iv []byte) (ICryptor, error) {
+	cipher, err := aes.NewCipher(aesKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewCFBCipher(cipher, iv), nil
 }
