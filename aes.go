@@ -42,3 +42,17 @@ func NewAesCFBCryptor(aesKey, iv []byte) (ICryptor, error) {
 	}
 	return NewCFBCipher(cipher, iv), nil
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/23 09:44:03 ColeCai.
+// *********************************************************************************************************************
+func NewAesECBCryptor(aesKey []byte, padding PaddingT) (ICryptor, error) {
+	cipher, err := aes.NewCipher(aesKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewECBCipher(cipher, padding), nil
+}
