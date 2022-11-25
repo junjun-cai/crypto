@@ -70,3 +70,17 @@ func NewAesOFBCryptor(aesKey, iv []byte) (ICryptor, error) {
 	}
 	return NewOFBCipher(cipher, iv), nil
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/11/25 09:42:57 ColeCai.
+// *********************************************************************************************************************
+func NewAesCTRCryptor(aesKey, iv []byte) (ICryptor, error) {
+	cipher, err := aes.NewCipher(aesKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewCTRCipher(cipher, iv), nil
+}
