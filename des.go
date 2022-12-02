@@ -70,3 +70,17 @@ func NewDesOFBCryptor(desKey, iv []byte) (ICryptor, error) {
 	}
 	return NewOFBCipher(cipher, iv), nil
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/12/02 09:37:53 ColeCai.
+// *********************************************************************************************************************
+func NewDesCTRCryptor(desKey, iv []byte) (ICryptor, error) {
+	cipher, err := des.NewCipher(desKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewCTRCipher(cipher, iv), nil
+}
