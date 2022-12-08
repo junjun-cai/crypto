@@ -56,3 +56,17 @@ func New3DesECBCryptor(desKey []byte, padding PaddingT) (ICryptor, error) {
 	}
 	return NewECBCipher(cipher, padding), nil
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/12/08 09:38:13 ColeCai.
+// *********************************************************************************************************************
+func New3DesOFBCryptor(desKey, iv []byte) (ICryptor, error) {
+	cipher, err := des.NewTripleDESCipher(desKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewOFBCipher(cipher, iv), nil
+}
