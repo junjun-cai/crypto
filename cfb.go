@@ -16,8 +16,8 @@ package crypto
 import "crypto/cipher"
 
 type CFBCipher struct {
-	block cipher.Block
-	iv    []byte
+	enStream cipher.Stream
+	deStream cipher.Stream
 }
 
 // *********************************************************************************************************************
@@ -25,11 +25,13 @@ type CFBCipher struct {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/10 10:43:51 ColeCai.
+// *	-update: 2022/12/16 09:57:20 ColeCai.
+// *             init encrypt and decrypt stream in CFBCipher construction stage.
 // *********************************************************************************************************************
 func NewCFBCipher(block cipher.Block, iv []byte) *CFBCipher {
 	return &CFBCipher{
-		block: block,
-		iv:    iv,
+		enStream: cipher.NewCFBEncrypter(block, iv),
+		deStream: cipher.NewCFBDecrypter(block, iv),
 	}
 }
 
@@ -41,8 +43,7 @@ func NewCFBCipher(block cipher.Block, iv []byte) *CFBCipher {
 // *********************************************************************************************************************
 func (c *CFBCipher) Encrypt(src []byte) ([]byte, error) {
 	encrypted := make([]byte, len(src))
-	cfb := cipher.NewCFBEncrypter(c.block, c.iv)
-	cfb.XORKeyStream(encrypted, src)
+	c.enStream.XORKeyStream(encrypted, src)
 	return encrypted, nil
 }
 
@@ -54,7 +55,6 @@ func (c *CFBCipher) Encrypt(src []byte) ([]byte, error) {
 // *********************************************************************************************************************
 func (c *CFBCipher) Decrypt(src []byte) ([]byte, error) {
 	decrypted := make([]byte, len(src))
-	cfb := cipher.NewCFBDecrypter(c.block, c.iv)
-	cfb.XORKeyStream(decrypted, src)
+	c.deStream.XORKeyStream(decrypted, src)
 	return decrypted, nil
 }
