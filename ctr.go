@@ -16,8 +16,7 @@ package crypto
 import "crypto/cipher"
 
 type CTRCipher struct {
-	block cipher.Block
-	iv    []byte
+	ctrStream cipher.Stream
 }
 
 // *********************************************************************************************************************
@@ -25,12 +24,11 @@ type CTRCipher struct {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/11 14:20:08 ColeCai.
+// *	-update: 2022/12/19 14:08:54 ColeCai.
+// *             init CTR stream in CTRCipher construction stage.
 // *********************************************************************************************************************
 func NewCTRCipher(block cipher.Block, iv []byte) *CTRCipher {
-	return &CTRCipher{
-		block: block,
-		iv:    iv,
-	}
+	return &CTRCipher{ctrStream: cipher.NewCTR(block, iv)}
 }
 
 // *********************************************************************************************************************
@@ -38,11 +36,11 @@ func NewCTRCipher(block cipher.Block, iv []byte) *CTRCipher {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/11 14:20:59 ColeCai.
+// *	-update: 2022/12/19 14:09:44 ColeCai.
 // *********************************************************************************************************************
 func (c *CTRCipher) Encrypt(src []byte) ([]byte, error) {
 	dst := make([]byte, len(src))
-	ctr := cipher.NewCTR(c.block, c.iv)
-	ctr.XORKeyStream(dst, src)
+	c.ctrStream.XORKeyStream(dst, src)
 	return dst, nil
 }
 
@@ -51,7 +49,10 @@ func (c *CTRCipher) Encrypt(src []byte) ([]byte, error) {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/11 14:22:40 ColeCai.
+// *	-update: 2022/12/19 14:10:23 ColeCai.
 // *********************************************************************************************************************
 func (c *CTRCipher) Decrypt(src []byte) ([]byte, error) {
-	return c.Decrypt(src)
+	dst := make([]byte, len(src))
+	c.ctrStream.XORKeyStream(dst, src)
+	return dst, nil
 }
