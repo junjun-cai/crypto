@@ -83,12 +83,10 @@ func PKCS5UnPadding(src []byte) ([]byte, error) {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/03 10:03:49 ColeCai.
+// *	-update: 2022/12/20 11:42:18 ColeCai.
 // *********************************************************************************************************************
 func ZerosPadding(src []byte, blockSize int) []byte {
 	padding := blockSize - len(src)%blockSize
-	if padding == 0 {
-		return src
-	}
 	return append(src, bytes.Repeat([]byte{byte(0)}, padding)...)
 }
 
@@ -97,13 +95,12 @@ func ZerosPadding(src []byte, blockSize int) []byte {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/03 10:05:30 ColeCai.
+// *	-update: 2022/12/20 11:42:32 ColeCai.
 // *********************************************************************************************************************
 func ZerosUnPadding(src []byte) ([]byte, error) {
-	for i := len(src) - 1; ; i-- {
-		if src[i] != 0 {
-			return src[:i+1], nil
-		}
-	}
+	return bytes.TrimFunc(src, func(r rune) bool {
+		return r == rune(0)
+	}), nil
 }
 
 // *********************************************************************************************************************
