@@ -16,8 +16,9 @@ package crypto
 import "crypto/cipher"
 
 type ECBCipher struct {
-	block   cipher.Block
 	padding PaddingT
+	enBlock cipher.BlockMode
+	deBlock cipher.BlockMode
 }
 
 // *********************************************************************************************************************
@@ -25,11 +26,14 @@ type ECBCipher struct {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/17 09:42:17 ColeCai.
+// *	-update: 2022/12/20 09:36:13 ColeCai.
+// *			 init encrypt and decrypt block in ECBCipher construction stage.
 // *********************************************************************************************************************
 func NewECBCipher(block cipher.Block, padding PaddingT) *ECBCipher {
 	return &ECBCipher{
-		block:   block,
 		padding: padding,
+		enBlock: newECBEncrypter(block),
+		deBlock: newECBDecrypter(block),
 	}
 }
 
@@ -38,12 +42,12 @@ func NewECBCipher(block cipher.Block, padding PaddingT) *ECBCipher {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/17 09:43:14 ColeCai.
+// *	-update: 2022/12/20 09:38:29 ColeCai.
 // *********************************************************************************************************************
 func (e *ECBCipher) Encrypt(src []byte) ([]byte, error) {
-	src = Padding(e.padding, src, e.block.BlockSize())
+	src = Padding(e.padding, src, e.enBlock.BlockSize())
 	encrypted := make([]byte, len(src))
-	ecb := NewECBEncrypter(e.block)
-	ecb.CryptBlocks(encrypted, src)
+	e.enBlock.CryptBlocks(encrypted, src)
 	return encrypted, nil
 }
 
@@ -52,12 +56,12 @@ func (e *ECBCipher) Encrypt(src []byte) ([]byte, error) {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/17 09:45:27 ColeCai.
+// *	-update: 2022/12/20 09:39:30 ColeCai.
 // *********************************************************************************************************************
 func (e *ECBCipher) Decrypt(src []byte) ([]byte, error) {
-	dst := make([]byte, len(src))
-	ecb := NewECBDecrypter(e.block)
-	ecb.CryptBlocks(dst, src)
-	return UnPadding(e.padding, dst)
+	decrypted := make([]byte, len(src))
+	e.deBlock.CryptBlocks(decrypted, src)
+	return UnPadding(e.padding, decrypted)
 }
 
 type ecb struct {
@@ -85,8 +89,9 @@ type ecbEncrypter ecb
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/15 12:13:09 ColeCai.
+// *	-update: 2022/12/20 09:34:34 ColeCai.
 // *********************************************************************************************************************
-func NewECBEncrypter(b cipher.Block) cipher.BlockMode {
+func newECBEncrypter(b cipher.Block) cipher.BlockMode {
 	return (*ecbEncrypter)(newECB(b))
 }
 
@@ -125,8 +130,9 @@ type ecbDecrypter ecb
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/16 10:06:31 ColeCai.
+// *	-update: 2022/12/20 09:34:50 ColeCai.
 // *********************************************************************************************************************
-func NewECBDecrypter(b cipher.Block) cipher.BlockMode {
+func newECBDecrypter(b cipher.Block) cipher.BlockMode {
 	return (*ecbDecrypter)(newECB(b))
 }
 
