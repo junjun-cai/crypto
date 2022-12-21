@@ -16,8 +16,7 @@ package crypto
 import "crypto/cipher"
 
 type OFBCipher struct {
-	block cipher.Block
-	iv    []byte
+	ofbStream cipher.Stream
 }
 
 // *********************************************************************************************************************
@@ -25,12 +24,11 @@ type OFBCipher struct {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/14 10:36:37 ColeCai.
+// *	-update: 2022/12/21 09:40:32 ColeCai.
+// *             init OFB stream in OFBCipher construction stage.
 // *********************************************************************************************************************
 func NewOFBCipher(block cipher.Block, iv []byte) *OFBCipher {
-	return &OFBCipher{
-		block: block,
-		iv:    iv,
-	}
+	return &OFBCipher{ofbStream: cipher.NewOFB(block, iv)}
 }
 
 // *********************************************************************************************************************
@@ -38,11 +36,11 @@ func NewOFBCipher(block cipher.Block, iv []byte) *OFBCipher {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/14 10:37:31 ColeCai.
+// *	-update: 2022/12/21 09:41:38 ColeCai.
 // *********************************************************************************************************************
 func (o *OFBCipher) Encrypt(src []byte) ([]byte, error) {
 	dst := make([]byte, len(src))
-	ofb := cipher.NewOFB(o.block, o.iv)
-	ofb.XORKeyStream(dst, src)
+	o.ofbStream.XORKeyStream(dst, src)
 	return dst, nil
 }
 
@@ -51,7 +49,10 @@ func (o *OFBCipher) Encrypt(src []byte) ([]byte, error) {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/14 10:39:09 ColeCai.
+// *	-update: 2022/12/21 09:41:59 ColeCai.
 // *********************************************************************************************************************
 func (o *OFBCipher) Decrypt(src []byte) ([]byte, error) {
-	return o.Encrypt(src)
+	dst := make([]byte, len(src))
+	o.ofbStream.XORKeyStream(dst, src)
+	return dst, nil
 }
