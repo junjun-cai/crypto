@@ -63,9 +63,11 @@ func PKCS7UnPadding(src []byte) ([]byte, error) {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/02 10:38:19 ColeCai.
+// *	-update: 2022/12/21 09:56:54 ColeCai.
+// *             PKCS5 padding length is 8 bytes
 // *********************************************************************************************************************
-func PKCS5Padding(src []byte, blockSize int) []byte {
-	return PKCS7Padding(src, blockSize)
+func PKCS5Padding(src []byte) []byte {
+	return PKCS7Padding(src, 8)
 }
 
 // *********************************************************************************************************************
@@ -112,7 +114,7 @@ func ZerosUnPadding(src []byte) ([]byte, error) {
 func Padding(padding PaddingT, src []byte, blockSize int) []byte {
 	switch padding {
 	case PKCS5_PADDING:
-		return PKCS5Padding(src, blockSize)
+		return PKCS5Padding(src)
 	case PKCS7_PADDING:
 		return PKCS7Padding(src, blockSize)
 	case ZEROS_PADDING:
