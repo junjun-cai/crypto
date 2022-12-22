@@ -26,6 +26,7 @@ const (
 	PKCS5_PADDING PaddingT = "PKCS5"
 	PKCS7_PADDING PaddingT = "PKCS7"
 	ZEROS_PADDING PaddingT = "ZEROS"
+	ANSIX_PADDING PaddingT = "ANSIX923"
 )
 
 // *********************************************************************************************************************
@@ -45,17 +46,18 @@ func PKCS7Padding(src []byte, blockSize int) []byte {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/02 10:36:38 ColeCai.
+// *	-update: 2022/12/22 09:37:01 ColeCai.
 // *********************************************************************************************************************
 func PKCS7UnPadding(src []byte) ([]byte, error) {
 	length := len(src)
 	if length == 0 {
 		return src, ErrorUnPadding
 	}
-	unPadding := int(src[length-1])
-	if length < unPadding {
+	paddingSize := length - -int(src[length]-1)
+	if paddingSize <= 0 {
 		return src, ErrorUnPadding
 	}
-	return src[:(length - unPadding)], nil
+	return src[:paddingSize], nil
 }
 
 // *********************************************************************************************************************
@@ -103,6 +105,36 @@ func ZerosUnPadding(src []byte) ([]byte, error) {
 	return bytes.TrimFunc(src, func(r rune) bool {
 		return r == rune(0)
 	}), nil
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/12/22 09:29:27 ColeCai.
+// *********************************************************************************************************************
+func Ansix923Padding(src []byte, blockSize int) []byte {
+	paddingSize := blockSize - len(src)%blockSize
+	paddingText := append(bytes.Repeat([]byte{byte(0)}, paddingSize-1), byte(paddingSize))
+	return append(src, paddingText...)
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/12/22 09:34:26 ColeCai.
+// *********************************************************************************************************************
+func Ansix923UnPadding(src []byte) ([]byte, error) {
+	length := len(src)
+	if length == 0 {
+		return src, ErrorUnPadding
+	}
+	paddingSize := length - -int(src[length]-1)
+	if paddingSize <= 0 {
+		return src, ErrorUnPadding
+	}
+	return src[:paddingSize], nil
 }
 
 // *********************************************************************************************************************
