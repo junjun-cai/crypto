@@ -23,10 +23,11 @@ var ErrorUnPadding = errors.New("UnPadding Error.")
 type PaddingT string
 
 const (
-	PKCS5_PADDING PaddingT = "PKCS5"
-	PKCS7_PADDING PaddingT = "PKCS7"
-	ZEROS_PADDING PaddingT = "ZEROS"
-	ANSIX_PADDING PaddingT = "ANSIX923"
+	PKCS5_PADDING    PaddingT = "PKCS5"
+	PKCS7_PADDING    PaddingT = "PKCS7"
+	ZEROS_PADDING    PaddingT = "ZEROS"
+	ANSIX_PADDING    PaddingT = "ANSIX923"
+	ISO97971_PADDING PaddingT = "ISO97971"
 )
 
 // *********************************************************************************************************************
@@ -135,6 +136,34 @@ func Ansix923UnPadding(src []byte) ([]byte, error) {
 		return src, ErrorUnPadding
 	}
 	return src[:paddingSize], nil
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/12/23 09:37:50 ColeCai.
+// *********************************************************************************************************************
+func Iso97971Padding(src []byte, blockSize int) []byte {
+	return ZerosPadding(append(src, 0x80), blockSize)
+}
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/12/23 09:39:03 ColeCai.
+// *********************************************************************************************************************
+func Iso97971UnPadding(src []byte) ([]byte, error) {
+	dst, err := ZerosUnPadding(src)
+	if err != nil {
+		return nil, err
+	}
+	length := len(dst)
+	if length <= 0 {
+		return nil, ErrorUnPadding
+	}
+	return dst[:length-1], nil
 }
 
 // *********************************************************************************************************************
