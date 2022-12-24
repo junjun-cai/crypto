@@ -16,7 +16,7 @@ package crypto
 import "crypto/cipher"
 
 type ECBCipher struct {
-	padding PaddingT
+	padding padding
 	enBlock cipher.BlockMode
 	deBlock cipher.BlockMode
 }
@@ -29,7 +29,7 @@ type ECBCipher struct {
 // *	-update: 2022/12/20 09:36:13 ColeCai.
 // *			 init encrypt and decrypt block in ECBCipher construction stage.
 // *********************************************************************************************************************
-func NewECBCipher(block cipher.Block, padding PaddingT) *ECBCipher {
+func NewECBCipher(block cipher.Block, padding padding) *ECBCipher {
 	return &ECBCipher{
 		padding: padding,
 		enBlock: newECBEncrypter(block),
@@ -43,9 +43,13 @@ func NewECBCipher(block cipher.Block, padding PaddingT) *ECBCipher {
 // * HISTORY:
 // *    -create: 2022/11/17 09:43:14 ColeCai.
 // *	-update: 2022/12/20 09:38:29 ColeCai.
+// *	-update: 2022/12/24 17:51:18 ColeCai.
 // *********************************************************************************************************************
 func (e *ECBCipher) Encrypt(src []byte) ([]byte, error) {
-	src = Padding(e.padding, src, e.enBlock.BlockSize())
+	src, err := Padding(e.padding, src, e.enBlock.BlockSize())
+	if err != nil {
+		return nil, err
+	}
 	encrypted := make([]byte, len(src))
 	e.enBlock.CryptBlocks(encrypted, src)
 	return encrypted, nil

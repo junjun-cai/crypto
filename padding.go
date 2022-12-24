@@ -20,14 +20,16 @@ import (
 
 var ErrorUnPadding = errors.New("UnPadding Error.")
 
-type PaddingT string
+type padding string
 
 const (
-	PKCS5_PADDING    PaddingT = "PKCS5"
-	PKCS7_PADDING    PaddingT = "PKCS7"
-	ZEROS_PADDING    PaddingT = "ZEROS"
-	ANSIX_PADDING    PaddingT = "ANSIX923"
-	ISO97971_PADDING PaddingT = "ISO97971"
+	No       padding = "no"
+	PKCS5    padding = "PKCS5"
+	PKCS7    padding = "PKCS7"
+	ZERO     padding = "ZERO"
+	ANSIX923 padding = "ANSIX923"
+	ISO97971 padding = "ISO97971"
+	ISO10126 padding = "ISO10126"
 )
 
 // *********************************************************************************************************************
@@ -37,9 +39,9 @@ const (
 // *    -create: 2022/11/02 10:34:44 ColeCai.
 // *********************************************************************************************************************
 func PKCS7Padding(src []byte, blockSize int) []byte {
-	padding := blockSize - len(src)%blockSize
-	padText := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(src, padText...)
+	paddingSize := blockSize - len(src)%blockSize
+	paddingText := bytes.Repeat([]byte{byte(paddingSize)}, paddingSize)
+	return append(src, paddingText...)
 }
 
 // *********************************************************************************************************************
@@ -91,8 +93,8 @@ func PKCS5UnPadding(src []byte) ([]byte, error) {
 // *	-update: 2022/12/20 11:42:18 ColeCai.
 // *********************************************************************************************************************
 func ZerosPadding(src []byte, blockSize int) []byte {
-	padding := blockSize - len(src)%blockSize
-	return append(src, bytes.Repeat([]byte{byte(0)}, padding)...)
+	paddingSize := blockSize - len(src)%blockSize
+	return append(src, bytes.Repeat([]byte{byte(0)}, paddingSize)...)
 }
 
 // *********************************************************************************************************************
@@ -166,22 +168,63 @@ func Iso97971UnPadding(src []byte) ([]byte, error) {
 	return dst[:length-1], nil
 }
 
+// ***********************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/12/24 17:27:56 ColeCai.
+// ***********************************************************************************************
+func Iso10126Padding(src []byte, blockSize int) []byte {
+	paddingSize := blockSize - len(src)%blockSize
+	randText := RandNBytes(blockSize - 1)
+	paddingText := append(randText, byte(paddingSize))
+	return append(src, paddingText...)
+}
+
+// ***********************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/12/24 17:30:29 ColeCai.
+// ***********************************************************************************************
+func Iso10126UnPadding(src []byte) ([]byte, error) {
+	length := len(src)
+	if length <= 0 {
+		return src, ErrorUnPadding
+	}
+	paddingSize := int(src[length-1])
+	if length <= paddingSize {
+		return src, ErrorUnPadding
+	}
+	return src[0 : length-paddingSize], nil
+}
+
 // *********************************************************************************************************************
 // * SUMMARY:
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/04 10:31:39 ColeCai.
+// *	-update: 2022/12/24 17:34:46 ColeCai.
 // *********************************************************************************************************************
-func Padding(padding PaddingT, src []byte, blockSize int) []byte {
+func Padding(padding padding, src []byte, blockSize int) ([]byte, error) {
 	switch padding {
-	case PKCS5_PADDING:
-		return PKCS5Padding(src)
-	case PKCS7_PADDING:
-		return PKCS7Padding(src, blockSize)
-	case ZEROS_PADDING:
-		return ZerosPadding(src, blockSize)
+	case No:
+		return src, nil
+	case PKCS5:
+		return PKCS5Padding(src), nil
+	case PKCS7:
+		return PKCS7Padding(src, blockSize), nil
+	case ZERO:
+		return ZerosPadding(src, blockSize), nil
+	case ANSIX923:
+		return Ansix923Padding(src, blockSize), nil
+	case ISO97971:
+		return Iso97971Padding(src, blockSize), nil
+	case ISO10126:
+		return Iso10126Padding(src, blockSize), nil
+	default:
+		return nil, errors.New("unsupported padding type")
 	}
-	return src
 }
 
 // *********************************************************************************************************************
@@ -189,15 +232,25 @@ func Padding(padding PaddingT, src []byte, blockSize int) []byte {
 // * WARNING:
 // * HISTORY:
 // *    -create: 2022/11/04 10:34:16 ColeCai.
+// *	-update: 2022/12/24 17:35:53 ColeCai.
 // *********************************************************************************************************************
-func UnPadding(padding PaddingT, src []byte) ([]byte, error) {
+func UnPadding(padding padding, src []byte) ([]byte, error) {
 	switch padding {
-	case PKCS5_PADDING:
+	case No:
+		return src, nil
+	case PKCS5:
 		return PKCS5UnPadding(src)
-	case PKCS7_PADDING:
+	case PKCS7:
 		return PKCS7UnPadding(src)
-	case ZEROS_PADDING:
+	case ZERO:
 		return ZerosUnPadding(src)
+	case ANSIX923:
+		return Ansix923UnPadding(src)
+	case ISO97971:
+		return Iso97971UnPadding(src)
+	case ISO10126:
+		return Iso10126UnPadding(src)
+	default:
+		return src, nil
 	}
-	return src, nil
 }

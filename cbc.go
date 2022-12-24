@@ -16,7 +16,7 @@ package crypto
 import "crypto/cipher"
 
 type CBCCipher struct {
-	padding PaddingT
+	padding padding
 	enBlock cipher.BlockMode
 	deBlock cipher.BlockMode
 }
@@ -29,7 +29,7 @@ type CBCCipher struct {
 // *	-update: 2022/12/15 09:51:03 ColeCai.
 // *			 init encrypt and decrypt block in CBCCipher construction stage.
 // *********************************************************************************************************************
-func NewCBCCipher(block cipher.Block, iv []byte, padding PaddingT) *CBCCipher {
+func NewCBCCipher(block cipher.Block, iv []byte, padding padding) *CBCCipher {
 	return &CBCCipher{
 		padding: padding,
 		enBlock: cipher.NewCBCEncrypter(block, iv),
@@ -43,9 +43,13 @@ func NewCBCCipher(block cipher.Block, iv []byte, padding PaddingT) *CBCCipher {
 // * HISTORY:
 // *    -create: 2022/11/07 10:47:24 ColeCai.
 // *	-update: 2022/12/15 09:54:08 ColeCai.
+// *	-update: 2022/12/24 17:50:58 ColeCai.
 // *********************************************************************************************************************
 func (c *CBCCipher) Encrypt(src []byte) ([]byte, error) {
-	padding := Padding(c.padding, src, c.enBlock.BlockSize())
+	padding, err := Padding(c.padding, src, c.enBlock.BlockSize())
+	if err != nil {
+		return nil, err
+	}
 	encrypted := make([]byte, len(padding))
 	c.enBlock.CryptBlocks(encrypted, padding)
 	return encrypted, nil

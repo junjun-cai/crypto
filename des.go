@@ -21,7 +21,7 @@ import "crypto/des"
 // * HISTORY:
 // *    -create: 2022/11/28 09:38:33 ColeCai.
 // *********************************************************************************************************************
-func NewDesCBCCryptor(desKey, iv []byte, padding PaddingT) (ICryptor, error) {
+func NewDesCBCCryptor(desKey, iv []byte, padding padding) (ICryptor, error) {
 	cipher, err := des.NewCipher(desKey)
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func NewDesCFBCryptor(desKey, iv []byte) (ICryptor, error) {
 // * HISTORY:
 // *    -create: 2022/11/30 10:05:29 ColeCai.
 // *********************************************************************************************************************
-func NewDesECBCryptor(desKey []byte, padding PaddingT) (ICryptor, error) {
+func NewDesECBCryptor(desKey []byte, padding padding) (ICryptor, error) {
 	cipher, err := des.NewCipher(desKey)
 	if err != nil {
 		return nil, err
