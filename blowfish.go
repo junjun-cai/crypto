@@ -56,3 +56,17 @@ func NewBlowfishECBCryptor(blowKey []byte, padding padding) (ICryptor, error) {
 	}
 	return NewECBCipher(cipher, padding), nil
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/12/28 09:45:50 ColeCai.
+// *********************************************************************************************************************
+func NewBlowfishOFBCryptor(blowKey, iv []byte) (ICryptor, error) {
+	cipher, err := blowfish.NewCipher(blowKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewOFBCipher(cipher, iv), nil
+}
