@@ -70,3 +70,17 @@ func NewBlowfishOFBCryptor(blowKey, iv []byte) (ICryptor, error) {
 	}
 	return NewOFBCipher(cipher, iv), nil
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2022/12/29 09:45:22 ColeCai.
+// *********************************************************************************************************************
+func NewBlowfishCTRCryptor(blowKey, iv []byte) (ICryptor, error) {
+	cipher, err := blowfish.NewCipher(blowKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewCTRCipher(cipher, iv), nil
+}
