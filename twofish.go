@@ -42,3 +42,17 @@ func NewTwofishCFBCryptor(twoKey, iv []byte) (ICryptor, error) {
 	}
 	return NewCFBCipher(cipher, iv), nil
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2023/01/03 09:48:52 ColeCai.
+// *********************************************************************************************************************
+func NewTwofishECBCryptor(twoKey []byte, padding padding) (ICryptor, error) {
+	cipher, err := twofish.NewCipher(twoKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewECBCipher(cipher, padding), nil
+}
