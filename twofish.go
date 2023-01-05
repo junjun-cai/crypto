@@ -70,3 +70,17 @@ func NewTwofishOFBCryptor(twoKey, iv []byte) (ICryptor, error) {
 	}
 	return NewOFBCipher(cipher, iv), nil
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2023/01/05 09:33:00 ColeCai.
+// *********************************************************************************************************************
+func NewTwofishCTRCryptor(twoKey, iv []byte) (ICryptor, error) {
+	cipher, err := twofish.NewCipher(twoKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewCTRCipher(cipher, iv), nil
+}
