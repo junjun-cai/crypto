@@ -44,3 +44,17 @@ func NewXteaCFBCryptor(xteaKey, iv []byte) (ICryptor, error) {
 	}
 	return NewCFBCipher(cipher, iv), nil
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2023/01/10 09:34:34 ColeCai.
+// *********************************************************************************************************************
+func NewXteaECBCryptor(xteaKey []byte, padding padding) (ICryptor, error) {
+	cipher, err := xtea.NewCipher(xteaKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewECBCipher(cipher, padding), nil
+}
