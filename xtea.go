@@ -72,3 +72,17 @@ func NewXteaOFBCryptor(xteaKey, iv []byte) (ICryptor, error) {
 	}
 	return NewOFBCipher(cipher, iv), nil
 }
+
+// *********************************************************************************************************************
+// * SUMMARY:
+// * WARNING:
+// * HISTORY:
+// *    -create: 2023/01/12 10:25:32 ColeCai.
+// *********************************************************************************************************************
+func NewXteaCTRCryptor(xteaKey, iv []byte) (ICryptor, error) {
+	cipher, err := xtea.NewCipher(xteaKey)
+	if err != nil {
+		return nil, err
+	}
+	return NewCTRCipher(cipher, iv), nil
+}
