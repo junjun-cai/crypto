@@ -56,7 +56,7 @@ func PKCS7UnPadding(src []byte) ([]byte, error) {
 	if length == 0 {
 		return src, ErrorUnPadding
 	}
-	paddingSize := length - -int(src[length]-1)
+	paddingSize := length - int(src[length]-1)
 	if paddingSize <= 0 {
 		return src, ErrorUnPadding
 	}

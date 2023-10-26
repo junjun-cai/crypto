@@ -32,7 +32,7 @@ func NewAesCryptor(aesKey []byte, mode Mode, padding padding, iv []byte) (ICrypt
 	}
 	switch mode {
 	case CBC:
-		return NewCFBCipher(block, iv), nil
+		return NewCBCCipher(block, iv, padding), nil
 	case CFB:
 		return NewCFBCipher(block, iv), nil
 	case OFB:
