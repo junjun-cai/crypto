@@ -23,6 +23,7 @@ const (
 	OFB Mode = "OFB"
 	ECB Mode = "ECB"
 	CTR Mode = "CTR"
+	XTS Mode = "XTS"
 )
 
 func NewAesCryptor(aesKey []byte, mode Mode, padding padding, iv []byte) (ICryptor, error) {
@@ -41,6 +42,8 @@ func NewAesCryptor(aesKey []byte, mode Mode, padding padding, iv []byte) (ICrypt
 		return NewECBCipher(block, padding), nil
 	case CTR:
 		return NewCTRCipher(block, iv), nil
+	case XTS:
+		return NewXTSCryptor(aes.NewCipher, aesKey, 0)
 	default:
 		return nil, errors.New("error mode.")
 	}
